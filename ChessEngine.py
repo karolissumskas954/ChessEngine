@@ -319,9 +319,9 @@ class GameState():
                     moves.append(Move((r, c), (r+moveAmount, c - 1), self.board, pawnPromotion=pawnPromotion))
                 if (r + moveAmount, c - 1) == self.enPassantPossible:
                     moves.append(Move((r, c), (r+moveAmount, c - 1), self.board, enPassant=True))
-        if c + 1 >= 7: # Capture Right
-            if not piecePinned or pinDirection == (moveAmount, 1):
-                if 0 <= c + 1 < 8 and self.board[r + moveAmount][c + 1][0] == enemyColor:
+        if c + 1 <= 7: # Capture Right
+            if not piecePinned or pinDirection == (moveAmount, + 1):
+                if 0 <= c + 1 <= 7 and self.board[r + moveAmount][c + 1][0] == enemyColor:
                     if r + moveAmount == backRow: # If peace gets to rank promotion
                         pawnPromotion = True
                     moves.append(Move((r, c), (r+moveAmount, c + 1), self.board, pawnPromotion=pawnPromotion))

@@ -6,6 +6,7 @@ Handles user input and displays the current GameState object.
 import pygame as p
 from ChessEngine import GameState
 from ChessEngine import Move
+from ChessAI import findRandomMove
 
 # p.init()
 WIDTH = HEIGHT = 512 #400 another option
@@ -40,13 +41,20 @@ def main():
     sqSelected = () #No square is selected (tuple: (row, column))
     playerClicks = [] #Player clicks (two tuples: [(6,4), (4,4)])
     gameOver = False
+
+    playerOne = True # If human is playing white = True. If AI is playing white = False
+    playerTwo = False # Same for black
+    
     while running:
+        # UI will be not resposive while AI is thinking. No threading involved
+        humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
             # mouse handler
+            # TODO Make this into method
             elif e.type == p.MOUSEBUTTONDOWN:
-                if not gameOver:
+                if not gameOver and humanTurn:
                     location = p.mouse.get_pos() #(x,y) location of mouse
                     col = location[0] // SQ_SIZE
                     row = location[1] // SQ_SIZE
@@ -80,6 +88,13 @@ def main():
                     playerClicks = []
                     moveMade = False
                     animate = False
+
+        # AI move finder
+        if not gameOver and not humanTurn:
+            AIMove = findRandomMove(validMoves)
+            gs.makeMove(AIMove)
+            moveMade = True
+            animate = True
 
         if moveMade:
             if animate:
