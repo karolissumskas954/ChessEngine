@@ -6,7 +6,7 @@ Handles user input and displays the current GameState object.
 import pygame as p
 from ChessEngine import GameState
 from ChessEngine import Move
-from ChessAI import findRandomMove
+from ChessAI import findRandomMove, findGreedyMove
 
 # p.init()
 WIDTH = HEIGHT = 512 #400 another option
@@ -91,7 +91,9 @@ def main():
 
         # AI move finder
         if not gameOver and not humanTurn:
-            AIMove = findRandomMove(validMoves)
+            AIMove = findGreedyMove(gs, validMoves)
+            if AIMove is None:
+                AIMove = findRandomMove(validMoves)
             gs.makeMove(AIMove)
             moveMade = True
             animate = True

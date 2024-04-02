@@ -232,7 +232,7 @@ class GameState():
                     break # Off board
 
         # Check for knight checks
-        knightMoves = ((-2, -1), (-2, 1), (-1, 2), (1, 2), (2, -1), (2, 1), (-1, -2), (1, -2))
+        knightMoves = ((-2, -1), (-2, 1), (-1, 2), (1, 2), (2, -1), (2, 1), (-1, -2),(1, -2))
         for m in knightMoves:
             endRow = startRow + m[0]
             endCol = startCol + m[1]
