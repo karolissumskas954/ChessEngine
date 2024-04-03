@@ -105,7 +105,8 @@ class GameState():
 
             #Give back castle rights
             self.castleRightsLog.pop() # Remove last moves updates
-            self.currentCastlingRights = self.castleRightsLog[-1]
+            newRights = self.castleRightsLog[-1]
+            self.currentCastlingRights = CastleRights(newRights.wks, newRights.bks, newRights.wqs, newRights.bqs)
 
             # Undo castle
             if move.castle:
@@ -115,6 +116,9 @@ class GameState():
                 else: # Queenside
                     self.board[move.endRow][move.endCol - 2] = self.board[move.endRow][move.endCol + 1] # Move rook
                     self.board[move.endRow][move.endCol + 1] = '--'
+
+            self.checkMate = False
+            self.staleMate = False
 
     '''
     All moves considering checks

@@ -6,7 +6,7 @@ Handles user input and displays the current GameState object.
 import pygame as p
 from ChessEngine import GameState
 from ChessEngine import Move
-from ChessAI import findRandomMove, findGreedyMove
+from ChessAI import findRandomMove, findGreedyMove, findBestMoveMinMax, findMoveMinMax
 
 # p.init()
 WIDTH = HEIGHT = 512 #400 another option
@@ -81,6 +81,7 @@ def main():
                     gs.undoMove()
                     moveMade = True
                     animate = False
+                    gameOver = False
                 if e.key == p.K_r: # Reset the board when 'r' is pressed
                     gs = GameState()
                     validMoves = gs.getValidMoves()
@@ -88,10 +89,11 @@ def main():
                     playerClicks = []
                     moveMade = False
                     animate = False
+                    gameOver = False
 
         # AI move finder
         if not gameOver and not humanTurn:
-            AIMove = findGreedyMove(gs, validMoves)
+            AIMove = findBestMoveMinMax(gs, validMoves)
             if AIMove is None:
                 AIMove = findRandomMove(validMoves)
             gs.makeMove(AIMove)
