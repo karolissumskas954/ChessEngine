@@ -6,7 +6,7 @@ Handles user input and displays the current GameState object.
 import pygame as p
 from ChessEngine import GameState
 from ChessEngine import Move
-from ChessAI import findRandomMove, findGreedyMove, findBestMoveMinMax, findMoveMinMax
+from ChessAI import findRandomMove, findBestMove
 
 # p.init()
 WIDTH = HEIGHT = 512 #400 another option
@@ -42,8 +42,8 @@ def main():
     playerClicks = [] #Player clicks (two tuples: [(6,4), (4,4)])
     gameOver = False
 
-    playerOne = True # If human is playing white = True. If AI is playing white = False
-    playerTwo = False # Same for black
+    playerOne = False # If human is playing white = True. If AI is playing white = False
+    playerTwo = True # Same for black
     
     while running:
         # UI will be not resposive while AI is thinking. No threading involved
@@ -93,7 +93,7 @@ def main():
 
         # AI move finder
         if not gameOver and not humanTurn:
-            AIMove = findBestMoveMinMax(gs, validMoves)
+            AIMove = findBestMove(gs, validMoves)
             if AIMove is None:
                 AIMove = findRandomMove(validMoves)
             gs.makeMove(AIMove)
