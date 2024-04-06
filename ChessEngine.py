@@ -96,9 +96,6 @@ class GameState():
             if move.enPassant:
                 self.board[move.endRow][move.endCol] = "--" # Removes pawn that was added in wrong square
                 self.board[move.startRow][move.endCol] = move.pieceCaptured
-                self.enPassantPossible = (move.endRow, move.endCol)
-            if move.pieceMoved[1] == 'p' and abs(move.startRow - move.endRow) == 2:
-                self.enPassantPossible = ()
 
             self.enPassantPossibleLog.pop()
             self.enPassantPossible = self.enPassantPossibleLog[-1]
@@ -442,18 +439,6 @@ class GameState():
     Update the castle rights given the move
     '''
     def updateCastleRights(self, move):
-
-        if move.pieceCaptured == 'wR':
-            if move.endCol == 0: # Left rook
-                self.currentCastlingRights.wqs = False
-            elif move.endCol == 7: # Right rook
-                self.currentCastlingRights.wks = False
-        elif move.pieceCaptured == 'bR':
-            if move.endCol == 0: # Left rook
-                self.currentCastlingRights.bqs = False
-            elif move.endCol == 7: # Right rook
-                self.currentCastlingRights.bks = False
-
         if move.pieceMoved == 'wK':
             self.currentCastlingRights.wqs = False
             self.currentCastlingRights.wks = False
@@ -462,15 +447,29 @@ class GameState():
             self.currentCastlingRights.bks = False
         elif move.pieceMoved == 'wR':
             if move.startRow == 7:
-                if move.startCol == 7:
+                if move.startCol == 0:
                     self.currentCastlingRights.wqs = False
-                elif move.startCol == 0:
+                elif move.startCol == 7:
                     self.currentCastlingRights.wks = False
         elif move.pieceMoved == 'bR':
             if move.startRow == 0:
-                if move.startCol == 7:
+                if move.startCol == 0:
                     self.currentCastlingRights.bqs = False
-                elif move.startCol == 0:
+                elif move.startCol == 7:
+                    self.currentCastlingRights.bks = False
+
+        # If rook is captured
+        if move.pieceCaptured == 'wR':
+            if move.endRow == 7:
+                if move.endCol == 0:
+                    self.currentCastlingRights.wqs = False
+                elif move.endCol == 7:
+                    self.currentCastlingRights.wks = False
+        elif move.pieceCaptured == 'bR':
+            if move.endRow == 0:
+                if move.endCol == 0:
+                    self.currentCastlingRights.bqs = False
+                elif move.endCol == 7:
                     self.currentCastlingRights.bks = False
 
     '''
@@ -525,6 +524,7 @@ class Move():
         if enPassant:
             self.pieceCaptured = 'bp' if self.pieceMoved == 'wp' else 'wp' # Enpassant captures opposite color
         self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
+        self.isCaptured = self.pieceCaptured != '--'
         # print(self.moveID)
 
     '''
@@ -541,6 +541,35 @@ class Move():
 
     def getRankFile(self, r, c):
         return self.colsToFiles[c] + self.rowsToRanks[r]
+    
+    # Overring the str() function
+    def __str__(self):
+        # Castle move
+        if self.castle:
+            return "O-O" if self.endCol == 6 else "O-O-O" # King "O-O" side castle | Queens "O-O-O" side castle
+        endSquare = self.getRankFile(self.endRow, self.endCol)
+
+        #Pawn moves
+        if self.pieceMoved[1] == 'p':
+            if self.isCaptured:
+                return self.colsToFiles[self.startCol] + 'x' + endSquare
+            else:
+                return endSquare
+            
+            # Pawn promotions
+
+        # Two of the same type of piece moving to a square (Knights)
+        # '+' for check move. '#' for checkmate move
+
+        # Piece moves
+
+        moveString = self.pieceMoved[1]
+        if self.isCaptured:
+            moveString += 'x'
+        return moveString + endSquare
+
+    
+
 
     
 
