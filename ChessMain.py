@@ -4,6 +4,7 @@ Handles user input and displays the current GameState object.
 """
 
 import pygame as p
+from multiprocessing import Process, Queue
 from ChessEngine import GameState
 from ChessEngine import Move
 from ChessAI import findRandomMove, findBestMove
@@ -44,10 +45,14 @@ def main():
     playerClicks = [] #Player clicks (two tuples: [(6,4), (4,4)])
     gameOver = False
 
-    playerOne = True # If human is playing white = True. If AI is playing white = False
+    playerOne = False # If human is playing white = True. If AI is playing white = False
     playerTwo = True # Same for black
 
     moveLogFont = p.font.SysFont("Arial", 18, False, False)
+
+    AIThinking = False
+    moveFinderProcess = None
+    moveUndone = False
     
     while running:
         # UI will be not resposive while AI is thinking. No threading involved
@@ -58,7 +63,7 @@ def main():
             # mouse handler
             # TODO Make this into method
             elif e.type == p.MOUSEBUTTONDOWN:
-                if not gameOver and humanTurn:
+                if not gameOver:
                     location = p.mouse.get_pos() #(x,y) location of mouse
                     col = location[0] // SQ_SIZE
                     row = location[1] // SQ_SIZE
@@ -68,7 +73,7 @@ def main():
                     else :
                         sqSelected = (row, col)
                         playerClicks.append(sqSelected) #append for both 1st and 2nd clicks
-                    if len(playerClicks) == 2: #after 2nd click
+                    if len(playerClicks) == 2 and humanTurn: #after 2nd click
                             move = Move(playerClicks[0], playerClicks[1], gs.board)
                             for i in range(len(validMoves)):
                                 if move == validMoves[i]:
@@ -86,6 +91,11 @@ def main():
                     moveMade = True
                     animate = False
                     gameOver = False
+                    if AIThinking:
+                        moveFinderProcess.terminate()
+                        AIThinking = False
+                    moveUndone = True
+                    
                 if e.key == p.K_r: # Reset the board when 'r' is pressed
                     gs = GameState()
                     validMoves = gs.getValidMoves()
@@ -94,15 +104,27 @@ def main():
                     moveMade = False
                     animate = False
                     gameOver = False
+                    if AIThinking:
+                        moveFinderProcess.terminate()
+                        AIThinking = False
+                    moveUndone = True
 
         # AI move finder
-        if not gameOver and not humanTurn:
-            AIMove = findBestMove(gs, validMoves)
-            if AIMove is None:
-                AIMove = findRandomMove(validMoves)
-            gs.makeMove(AIMove)
-            moveMade = True
-            animate = True
+        if not gameOver and not humanTurn and not moveUndone:
+            if not AIThinking:
+                AIThinking = True
+                returnQueue = Queue() # Used to pass data between treads
+                moveFinderProcess = Process(target=findBestMove, args=(gs, validMoves, returnQueue))
+                moveFinderProcess.start() # Calls findBestMove
+
+            if not moveFinderProcess.is_alive():
+                AIMove = returnQueue.get()
+                if AIMove is None:
+                    AIMove = findRandomMove(validMoves)
+                gs.makeMove(AIMove)
+                moveMade = True
+                animate = True
+                AIThinking = False
 
         if moveMade:
             if animate:
@@ -110,6 +132,7 @@ def main():
             validMoves = gs.getValidMoves()
             moveMade = False
             animate = False
+            moveUndone = False
 
         drawGameState(screen, gs, validMoves, sqSelected, moveLogFont)
 
@@ -178,7 +201,7 @@ def drawMoveLog(screen, gs, font):
             moveString +=str(moveLog[i + 1]) + "   "
         moveTexts.append(moveString)
 
-    movesPerRow = 3
+    movesPerRow = 2
     padding = 5
     lineSpacing = 2
     textY = padding

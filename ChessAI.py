@@ -1,9 +1,67 @@
 import random
 
-pieceScores = {"K" : 0, "Q" : 10, "R" : 5, "B" : 3, "N" : 3, "p" : 1}
+pieceScores = {"K" : 0, "Q" : 9, "R" : 5, "B" : 3, "N" : 3, "p" : 1}
+
+knight_scores = [[0.0, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1, 0.0],
+                 [0.1, 0.3, 0.5, 0.5, 0.5, 0.5, 0.3, 0.1],
+                 [0.2, 0.5, 0.6, 0.65, 0.65, 0.6, 0.5, 0.2],
+                 [0.2, 0.55, 0.65, 0.7, 0.7, 0.65, 0.55, 0.2],
+                 [0.2, 0.5, 0.65, 0.7, 0.7, 0.65, 0.5, 0.2],
+                 [0.2, 0.55, 0.6, 0.65, 0.65, 0.6, 0.55, 0.2],
+                 [0.1, 0.3, 0.5, 0.55, 0.55, 0.5, 0.3, 0.1],
+                 [0.0, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1, 0.0]]
+
+bishop_scores = [[0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0],
+                 [0.2, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.2],
+                 [0.2, 0.4, 0.5, 0.6, 0.6, 0.5, 0.4, 0.2],
+                 [0.2, 0.5, 0.5, 0.6, 0.6, 0.5, 0.5, 0.2],
+                 [0.2, 0.4, 0.6, 0.6, 0.6, 0.6, 0.4, 0.2],
+                 [0.2, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.2],
+                 [0.2, 0.5, 0.4, 0.4, 0.4, 0.4, 0.5, 0.2],
+                 [0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0]]
+
+rook_scores = [[0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25],
+               [0.5, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75, 0.5],
+               [0.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.0],
+               [0.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.0],
+               [0.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.0],
+               [0.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.0],
+               [0.0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.0],
+               [0.25, 0.25, 0.25, 0.5, 0.5, 0.25, 0.25, 0.25]]
+
+queen_scores = [[0.0, 0.2, 0.2, 0.3, 0.3, 0.2, 0.2, 0.0],
+                [0.2, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.2],
+                [0.2, 0.4, 0.5, 0.5, 0.5, 0.5, 0.4, 0.2],
+                [0.3, 0.4, 0.5, 0.5, 0.5, 0.5, 0.4, 0.3],
+                [0.4, 0.4, 0.5, 0.5, 0.5, 0.5, 0.4, 0.3],
+                [0.2, 0.5, 0.5, 0.5, 0.5, 0.5, 0.4, 0.2],
+                [0.2, 0.4, 0.5, 0.4, 0.4, 0.4, 0.4, 0.2],
+                [0.0, 0.2, 0.2, 0.3, 0.3, 0.2, 0.2, 0.0]]
+
+pawn_scores = [[0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
+               [0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7],
+               [0.3, 0.3, 0.4, 0.5, 0.5, 0.4, 0.3, 0.3],
+               [0.25, 0.25, 0.3, 0.45, 0.45, 0.3, 0.25, 0.25],
+               [0.2, 0.2, 0.2, 0.4, 0.4, 0.2, 0.2, 0.2],
+               [0.25, 0.15, 0.1, 0.2, 0.2, 0.1, 0.15, 0.25],
+               [0.25, 0.3, 0.3, 0.0, 0.0, 0.3, 0.3, 0.25],
+               [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]]
+
+piece_position_scores = {"wN": knight_scores,
+                         "bN": knight_scores[::-1],
+                         "wB": bishop_scores,
+                         "bB": bishop_scores[::-1],
+                         "wQ": queen_scores,
+                         "bQ": queen_scores[::-1],
+                         "wR": rook_scores,
+                         "bR": rook_scores[::-1],
+                         "wp": pawn_scores,
+                         "bp": pawn_scores[::-1]}
+
+
 CHEKMATE = 1000
 STALEMATE = 0
-DEPTH = 2
+DEPTH = 3
 
 def findRandomMove(validMoves):
     return validMoves[random.randint(0, len(validMoves) - 1)] # Inclusive for both parameters
@@ -40,7 +98,7 @@ def findGreedyMove(gs, validMoves):
 '''
 Helper method to make first recursive call
 '''
-def findBestMove(gs, validMoves):
+def findBestMove(gs, validMoves, returnQueue):
     global nextMove
     global counter
     nextMove = None
@@ -48,7 +106,7 @@ def findBestMove(gs, validMoves):
     counter = 0
     findMoveNegaMaxAlphaBeta(gs, validMoves, DEPTH, -CHEKMATE, CHEKMATE, 1 if gs.whiteToMove else -1)
     # print(counter)
-    return nextMove
+    returnQueue.put(nextMove) 
 
 def findMoveMinMax(gs, validMoves, depth, whiteToMove):
     global nextMove
@@ -107,11 +165,6 @@ def findMoveNegaMaxAlphaBeta(gs, validMoves, depth, alpha, beta, turnMultiplier)
     counter += 1
     if depth == 0:
         return turnMultiplier * scoreBoard(gs)
-    
-    # Move ordering TODO
-
-
-
     maxScore = -CHEKMATE
     for move in validMoves:
         gs.makeMove(move)
@@ -142,12 +195,17 @@ def scoreBoard(gs):
         return STALEMATE
 
     score = 0
-    for row in gs.board:
-        for square in row:
-            if square[0] == 'w':
-                score += pieceScores[square[1]]
-            elif square[0] == 'b':
-                score -= pieceScores[square[1]]
+    for row in range(len(gs.board)):
+        for col in range(len(gs.board[row])):
+            piece = gs.board[row][col]
+            if piece != "--":
+                piece_position_score = 0
+                if piece[1] != 'K':
+                    piece_position_score = piece_position_scores[piece][row][col]
+                if piece[0] == 'w':
+                    score += pieceScores[piece[1]] + piece_position_score
+                if piece[0] == 'b':
+                    score -= pieceScores[piece[1]] + piece_position_score
     return score
 
 '''
